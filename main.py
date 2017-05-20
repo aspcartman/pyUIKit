@@ -1,6 +1,6 @@
-import pyglet
-import ui
 from pyglet.gl import *
+
+import ui
 
 
 class MainController(ui.Controller):
@@ -19,8 +19,8 @@ class MyView(ui.View):
         self.add_subview(subview)
 
     def handle_event(self, event):
-        if isinstance(event, ui.TouchEvent):
-            self._subview.frame.origin = event.touches[0].location_in_view(self)
+        if isinstance(event, ui.MouseEvent):
+            self._subview.frame.origin = event.location_in_view(self)
         return True
 
 

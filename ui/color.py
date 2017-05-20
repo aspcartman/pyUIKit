@@ -33,6 +33,10 @@ class Color:
 	def blue():
 		return Color(0x0000ff)
 
+	@staticmethod
+	def clear():
+		return Color(a=0)
+
 	def tuple(self):
 		return self.red, self.green, self.blue, self.alpha
 

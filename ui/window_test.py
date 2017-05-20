@@ -1,5 +1,5 @@
 from .controller import Controller
-from .geom import Rect
+from .geom import Rect, Vec
 from .view import View
 from .window import Window
 
@@ -13,5 +13,5 @@ class TestWindow:
 
 		window = Window(real_window=False, root=Controller(view_class=MyView))
 		window.frame = Rect(0, 0, 100, 100)
-		window.process_mouse_event(None, 10, 10, 0, 0, None, None)
+		window.process_mouse_event(None, Vec(10, 10))
 		assert self.catch is not None

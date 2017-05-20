@@ -3,7 +3,7 @@ import pyglet
 from graphics import Context
 from .color import Color
 from .controller import Controller
-from .event import MouseEvent, MouseEventType
+from .event import MouseEvent
 from .geom import Rect, Vec
 from .view import View
 
@@ -17,6 +17,7 @@ class Window(Controller, View):
 		self.background_color = Color.black()
 		self._needs_update = False
 		self._root_controller = None
+		self._view = self
 		if root is not None:
 			self.root_controller = root
 		if real_window:
@@ -45,16 +46,16 @@ class Window(Controller, View):
 		self.frame = Rect(0, 0, width, height)
 
 	def _pyglet_on_mouse_motion(self, x, y, dx, dy):
-		self.process_mouse_event(MouseEventType.MOVE, Vec(x, self.frame.height - y), delta=Vec(dx, dy))
+		self.process_mouse_event(MouseEvent.MOVE, Vec(x, self.frame.height - y), delta=Vec(dx, dy))
 
 	def _pyglet_on_mouse_press(self, x, y, button, modifiers):
-		self.process_mouse_event(MouseEventType.TOUCH, Vec(x, self.frame.height - y), buttons=[button], modifiers=modifiers)
+		self.process_mouse_event(MouseEvent.TOUCH, Vec(x, self.frame.height - y), buttons=[button], modifiers=modifiers)
 
 	def _pyglet_on_mouse_release(self, x, y, button, modifiers):
-		self.process_mouse_event(MouseEventType.RELEASE, Vec(x, self.frame.height - y), buttons=[button], modifiers=modifiers)
+		self.process_mouse_event(MouseEvent.RELEASE, Vec(x, self.frame.height - y), buttons=[button], modifiers=modifiers)
 
 	def _pyglet_on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
-		self.process_mouse_event(MouseEventType.DRAG, Vec(x, self.frame.height - y), delta=Vec(dx, dy), buttons=buttons, modifiers=modifiers)
+		self.process_mouse_event(MouseEvent.DRAG, Vec(x, self.frame.height - y), delta=Vec(dx, dy), buttons=buttons, modifiers=modifiers)
 
 	def _pyglet_on_mouse_enter(self, x, y):
 		pass
@@ -63,7 +64,7 @@ class Window(Controller, View):
 		pass
 
 	def _pyglet_on_mouse_scroll(self, x, y, scroll_x, scroll_y):
-		self.process_mouse_event(MouseEventType.SCROLL, Vec(x, self.frame.height - y), delta=Vec(scroll_x, scroll_y))
+		self.process_mouse_event(MouseEvent.SCROLL, Vec(x, self.frame.height - y), delta=Vec(scroll_x, scroll_y))
 		pass
 
 	@property
@@ -78,10 +79,6 @@ class Window(Controller, View):
 		self._root_controller = value
 
 		self.add_subview(value.view)
-
-	@property
-	def view(self) -> View:
-		return self
 
 	#
 	# !- Update
@@ -108,7 +105,7 @@ class Window(Controller, View):
 
 	def layout(self):
 		if self._root_controller is not None:
-			self._root_controller.view.frame = self.bounds
+			self._root_controller.view.frame = Rect(size=self.frame.size)
 
 	#
 	# !- Events

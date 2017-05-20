@@ -11,17 +11,16 @@ class MainController(ui.Controller):
 class MyView(ui.View):
 	def __init__(self, frame=ui.Rect()):
 		super().__init__(frame)
-
 		self.background_color = ui.Color.blue()
+
+		scroll = ui.ScrollView(ui.Rect(0, 0, 300, 300))
+		scroll.background_color = ui.Color.green()
+		self.add_subview(scroll)
+
 		subview = ui.View(ui.Rect(100, 100, 20, 20))
 		subview.background_color = ui.Color.red()
+		scroll.add_subview(subview)
 		self._subview = subview
-		self.add_subview(subview)
-
-	def handle_event(self, event):
-		if isinstance(event, ui.MouseEvent):
-			self._subview.frame.origin = event.location_in_view(self)
-		return True
 
 
 window = ui.Window()

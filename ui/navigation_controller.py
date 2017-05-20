@@ -42,8 +42,8 @@ class NavigationView(View):
 	def layout(self):
 		super().layout()
 		if self._content_view is not None:
-			self._content_view.frame = self.bounds
-		self.bar.frame = Rect(size=Vec(self.bounds.width, self.bar.preferred_size().y))
+			self._content_view.frame = Rect(size=self.frame.size)
+		self.bar.frame = Rect(size=Vec(self.frame.width, self.bar.preferred_size().y))
 
 	@property
 	def content_view(self) -> View:

@@ -5,7 +5,6 @@ from ui.view import *
 class TestView:
 	def test_hit_test(self):
 		v1 = View(frame=Rect(10, 10, 100, 100))
-		v1.bounds = Rect(10, 10, 100, 100)
 		v2 = View(frame=Rect(10, 10, 100, 100))
 		v1.add_subview(v2)
 		v3 = View(frame=Rect(10, 10, 100, 100))
@@ -56,12 +55,11 @@ class TestView:
 		v1 = View(frame=Rect(0, 0, 100, 100))
 		v2 = View(frame=Rect(10, 10, 100, 100))
 		v3 = View(frame=Rect(10, 10, 100, 100))
-		v3._bounds.origin = Vec(0, -100)
 
 		v1.add_subview(v2)
 		v2.add_subview(v3)
 
-		assert v3.convert_to(v1, Vec(0, 100)) == Vec(20, 20)
+		assert v3.convert_to(v1, Vec(0, 10)) == Vec(20, 30)
 
 	def test_next_responder(self):
 		v1 = View()

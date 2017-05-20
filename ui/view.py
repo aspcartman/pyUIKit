@@ -12,11 +12,11 @@ class View(Responder):
 		self.background_color = Color.white()
 		self.delegate = None
 		self._frame = frame
-		self._bounds = Rect(size=frame.size)
 		self._subviews = []
 		self._superview = None
 		self._needs_layout = True
 		self._needs_draw = True
+
 
 	def __str__(self):
 		return '{} {}'.format(self.__class__.__name__, self._frame)
@@ -28,21 +28,10 @@ class View(Responder):
 
 	@frame.setter
 	def frame(self, value):
-		old = self._bounds.size
+		old = self._frame.size
 		self._frame = value
-		self._bounds = Rect(origin=self._bounds.origin, size=value.size)
 		if old != value.size:
 			self.set_needs_layout()
-
-	@property
-	def bounds(self):
-		return self._bounds
-
-	@bounds.setter
-	def bounds(self, value):
-		if self._bounds.size != value.size:
-			self.set_needs_layout()
-		self._bounds = value
 
 	#
 	# !- Hierarchy
@@ -126,7 +115,7 @@ class View(Responder):
 	# !- Drawing
 	#
 	def _draw(self, ctx: Context):
-		ctx.draw_rect(self.bounds, self.background_color)
+		ctx.draw_rect(Rect(size=self.frame.size), self.background_color)
 		self._needs_draw = False
 		self.draw(ctx)
 		for sv in self.subviews:
@@ -143,13 +132,13 @@ class View(Responder):
 		if not self.point_inside(point):
 			return None
 		for sv in reversed(self._subviews):
-			v = sv.hit_test(point - sv.frame.origin - sv.bounds.origin)
+			v = sv.hit_test(point - sv.frame.origin)
 			if v is not None:
 				return v
 		return self
 
 	def point_inside(self, point) -> bool:
-		return point in self.bounds.size
+		return point in self.frame.size
 
 	def convert_from(self, view, point):
 		return view.convert_to(self, point)
@@ -159,11 +148,11 @@ class View(Responder):
 		if super_view is None:
 			return None
 		for sv in self.superviews(include_self=True):
-			point += sv.bounds.origin + sv.frame.origin
+			point += sv.frame.origin
 			if sv == super_view:
 				break
 		for sv in view.superviews(include_self=True):
-			point -= sv.bounds.origin + sv.frame.origin
+			point -= sv.frame.origin
 			if sv == super_view:
 				break
 		return point

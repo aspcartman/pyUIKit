@@ -1,10 +1,9 @@
 import math
-from typing import TypeVar
-
-Geom = TypeVar('Geom', 'Rect', 'Vec')
 
 
 class Vec:
+    __slots__ = ['x', 'y']
+
     def __init__(self, x: float = 0, y: float = 0):
         self.x = x
         self.y = y
@@ -29,6 +28,8 @@ class Vec:
 
 
 class Rect:
+    __slots__ = ['origin', 'size']
+
     def __init__(self, x=0, y=0, width=0, height=0, origin=None, size=None):
         if origin is not None:
             self.origin = origin

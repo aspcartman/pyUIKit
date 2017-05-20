@@ -34,7 +34,6 @@ class View(Responder):
         if old != value.size:
             self.set_needs_layout()
 
-
     @property
     def bounds(self):
         return self._bounds
@@ -92,12 +91,6 @@ class View(Responder):
         self._subviews.remove(subview)
         self._subviews.append(subview)
 
-    @property
-    def window(self):
-        for sv in self.superviews():
-            if isinstance(sv, 'Window'):
-                return sv
-
     def first_common_superview(self, view) -> ['View']:  # Needs optimizations
         mine = set(self.superviews(include_self=True))
         for sv in view.superviews(include_self=True):
@@ -109,7 +102,7 @@ class View(Responder):
     # !- Sizing
     #
     def preferred_size(self):
-        return Vec()
+        return Vec(0, 0)
 
     #
     # !- Layout

@@ -1,9 +1,10 @@
-from ui.geom import *
 import pyglet
+
+from ui.geom import *
 
 
 class Context:
-    def __init__(self, offset=Vec()):
+    def __init__(self, offset=Vec(0, 0)):
         self.offset = offset
 
     def draw_rect(self, rect, color):

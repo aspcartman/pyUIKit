@@ -1,5 +1,9 @@
 class Color:
-	def __init__(self, value=None, hex=None, r=None, g=None, b=None, a=None):
+	scheme = None
+
+	def __init__(self, value=None, hex=None, r=None, g=None, b=None, a=None, tuple=None):
+		self.alpha = 255
+
 		if hex is not None:
 			value = int(hex, 16)
 		if value is not None:
@@ -10,8 +14,12 @@ class Color:
 			self.red = r if r is not None else 0
 			self.green = g if g is not None else 0
 			self.blue = b if b is not None else 0
-
-		self.alpha = a if a is not None else 255
+		if tuple is not None:
+			self.red, self.green, self.blue = tuple
+			if len(tuple) > 3:
+				self.alpha = tuple[3]
+		if a is not None:
+			self.alpha = a
 
 	@staticmethod
 	def white():
@@ -42,3 +50,28 @@ class Color:
 
 	def with_alpha(self, alpha) -> 'Color':
 		return Color(r=self.red, g=self.green, b=self.blue, a=alpha)
+
+
+class FlatRedScheme:
+	@staticmethod
+	def back():
+		return Color(0x1C2021)
+
+	@staticmethod
+	def front():
+		return Color(0x353C3E)
+
+	@staticmethod
+	def tint():
+		return Color(0xE66A39)
+
+	@staticmethod
+	def warn():
+		return Color(0xD04E33)
+
+	@staticmethod
+	def white():
+		return Color(0xEEEEEE)
+
+
+Color.scheme = FlatRedScheme

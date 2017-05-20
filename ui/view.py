@@ -9,14 +9,13 @@ from .responder import Responder
 class View(Responder):
 	def __init__(self, frame=Rect()):
 		super().__init__()
-		self.background_color = Color.white()
+		self.background_color = Color.scheme.front()
 		self.delegate = None
 		self._frame = frame
 		self._subviews = []
 		self._superview = None
 		self._needs_layout = True
 		self._needs_draw = True
-
 
 	def __str__(self):
 		return '{} {}'.format(self.__class__.__name__, self._frame)

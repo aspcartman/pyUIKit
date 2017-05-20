@@ -122,7 +122,9 @@ class Window(Controller, View):
 		pass
 
 	def handle_event(self, event):
-		print('Unhandled event', event)
+		pass
+
+	# print('Unhandled event', event)
 
 	#
 	# !- Responder

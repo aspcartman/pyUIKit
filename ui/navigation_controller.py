@@ -2,6 +2,7 @@ from ui.color import Color
 from ui.controller import Controller
 from ui.geom import *
 from ui.view import View
+from .label import Label
 
 
 class NavigationController(Controller):
@@ -36,6 +37,7 @@ class NavigationView(View):
 		self._content_view = None
 
 		bar = NavigationBar()
+		bar.title_label.text = "Testing"
 		self.add_subview(bar)
 		self.bar = bar
 
@@ -61,7 +63,12 @@ class NavigationView(View):
 class NavigationBar(View):
 	def __init__(self, frame=Rect()):
 		super().__init__(frame)
-		self.background_color = Color.red().with_alpha(200)
+		self.background_color = Color.scheme.warn().with_alpha(250)
+		self.title_label = Label()
+		self.add_subview(self.title_label)
 
 	def preferred_size(self):
 		return Vec(-1, 60)
+
+	def layout(self):
+		self.title_label.frame = Rect(size=self.title_label.preferred_size(), center=self.frame.size / 2)

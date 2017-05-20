@@ -12,7 +12,7 @@ class Touch:
         self.location = location
 
     def location_in_view(self, view):
-        return self.window.convert_to(view, self.location)
+        return self.view.convert_to(view, self.location)
 
 
 class TouchEventType:

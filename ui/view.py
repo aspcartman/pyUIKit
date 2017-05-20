@@ -1,16 +1,19 @@
-import pyglet
-from ui.geom import *
-from ui.color import Color
-from ui.graphics import Context
-from typing import List, Iterator, TypeVar
+from typing import List
+
+from graphics import Context
+from .color import Color
+from .geom import Rect, Vec
+from .responder import Responder
 
 
-class View:
+class View(Responder):
     def __init__(self, frame=Rect()):
+        super().__init__()
         self.background_color = Color.white()
+        self.delegate = None
         self._frame = frame
         self._bounds = Rect(size=frame.size)
-        self._subviews: List[View] = []
+        self._subviews = []
         self._superview = None
         self._needs_layout = True
         self._needs_draw = True
@@ -25,8 +28,12 @@ class View:
 
     @frame.setter
     def frame(self, value):
+        old = self._bounds.size
         self._frame = value
-        self.bounds = Rect(origin=self._bounds.origin, size=value.size)
+        self._bounds = Rect(origin=self._bounds.origin, size=value.size)
+        if old != value.size:
+            self.set_needs_layout()
+
 
     @property
     def bounds(self):
@@ -49,21 +56,15 @@ class View:
     def superview(self) -> ['View']:
         return self._superview
 
-    def superviews(self) -> Iterator['View']:
-        current = self.superview
-        while current is not None:
-            yield current
-            current = current.superview
-
-    def traverse_view_chain(self):
-        current = self
-        while current is not None:
-            yield current
-            current = current.superview
-
     @superview.setter
     def superview(self, value):
         self._superview = value
+
+    def superviews(self, include_self=False):
+        current = self if include_self else self.superview
+        while current is not None:
+            yield current
+            current = current.superview
 
     def add_subview(self, view):
         view.remove_from_superview()
@@ -91,9 +92,15 @@ class View:
         self._subviews.remove(subview)
         self._subviews.append(subview)
 
+    @property
+    def window(self):
+        for sv in self.superviews():
+            if isinstance(sv, 'Window'):
+                return sv
+
     def first_common_superview(self, view) -> ['View']:  # Needs optimizations
-        mine = set(self.traverse_view_chain())
-        for sv in view.traverse_view_chain():
+        mine = set(self.superviews(include_self=True))
+        for sv in view.superviews(include_self=True):
             if sv in mine:
                 return sv
         return None
@@ -137,7 +144,7 @@ class View:
         pass
 
     #
-    # !- Events
+    # !- Hit Test
     #
     def hit_test(self, point: Vec) -> ['View']:
         if not self.point_inside(point):
@@ -149,7 +156,7 @@ class View:
         return self
 
     def point_inside(self, point) -> bool:
-        return self.bounds.origin + point in self.bounds
+        return point in self.bounds.size
 
     def convert_from(self, view, point):
         return view.convert_to(self, point)
@@ -158,11 +165,11 @@ class View:
         super_view = self.first_common_superview(view)
         if super_view is None:
             return None
-        for sv in self.traverse_view_chain():
+        for sv in self.superviews(include_self=True):
             point += sv.bounds.origin + sv.frame.origin
             if sv == super_view:
                 break
-        for sv in view.traverse_view_chain():
+        for sv in view.superviews(include_self=True):
             point -= sv.bounds.origin + sv.frame.origin
             if sv == super_view:
                 break
@@ -171,8 +178,7 @@ class View:
     #
     # !- Responder Chain
     #
-    def become_first_responder(self):
-        pass
-
-    def resign_first_responder(self):
-        pass
+    def next_responder(self):
+        if self.delegate is not None:
+            return self.delegate
+        return self.superview

@@ -2,6 +2,7 @@ import pyglet
 import ui
 from pyglet.gl import *
 
+
 class MainController(ui.Controller):
     def load_view(self):
         return MyView()
@@ -12,13 +13,16 @@ class MyView(ui.View):
         super().__init__(frame)
 
         self.background_color = ui.Color.blue()
-        subview = ui.View(ui.Rect(0, 0, 20, 20))
+        subview = ui.View(ui.Rect(100, 100, 20, 20))
         subview.background_color = ui.Color.red()
         self._subview = subview
         self.add_subview(subview)
 
-    def layout(self):
-        self._subview.frame.origin = self.bounds.size - self._subview.bounds.size
+    def handle_event(self, event):
+        if isinstance(event, ui.TouchEvent):
+            self._subview.frame.origin = event.touches[0].location_in_view(self)
+        return True
+
 
 window = ui.Window()
 window.root_controller = ui.NavigationController(MainController())

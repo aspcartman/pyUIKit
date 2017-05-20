@@ -1,4 +1,4 @@
-from ui.geom import *
+# from ui.geom import *
 from ui.view import *
 
 
@@ -27,6 +27,8 @@ class TestView:
         v2.add_subview(v3)
 
         assert list(v3.superviews()) == [v2, v1]
+        assert list(v3.superviews(include_self=False)) == [v2, v1]
+        assert list(v3.superviews(include_self=True)) == [v3, v2, v1]
 
     def test_common_superview(self):
         v1 = View()
@@ -60,3 +62,10 @@ class TestView:
         v2.add_subview(v3)
 
         assert v3.convert_to(v1, Vec(0, 100)) == Vec(20, 20)
+
+    def test_next_responder(self):
+        v1 = View()
+        v2 = View()
+        v1.add_subview(v2)
+
+        assert v2.next_responder() == v1

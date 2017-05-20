@@ -34,7 +34,7 @@ class Label(View):
 
 	def draw(self, ctx: Context):
 		self._pyglet_label.x = ctx.offset.x
-		self._pyglet_label.y = ctx.offset.y - self._pyglet_label.content_height
+		self._pyglet_label.y = ctx.offset.y - self._pyglet_label.content_height + 5
 		self._pyglet_label.draw()
 
 	def preferred_size(self):

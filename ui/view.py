@@ -7,11 +7,14 @@ from .responder import Responder
 
 
 class View(Responder):
-	def __init__(self, frame=Rect()):
+	def __init__(self, frame=None, origin=None, size=None):
 		super().__init__()
 		self.background_color = Color.scheme.front()
 		self.delegate = None
-		self._frame = frame
+		if origin or size:
+			self._frame = Rect(origin=origin, size=size)
+		else:
+			self._frame = frame if frame else Rect()
 		self._subviews = []
 		self._superview = None
 		self._needs_layout = True

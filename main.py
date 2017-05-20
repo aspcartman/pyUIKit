@@ -16,10 +16,9 @@ class MyView(ui.View):
 		self.add_subview(scroll)
 		self._scroll = scroll
 
-		subview = ui.View(ui.Rect(100, 100, 20, 20))
-		subview.background_color = ui.Color.scheme.tint()
-		scroll.add_subview(subview)
-		self._subview = subview
+		button = ui.Button(title="I'm the button, bitches!", origin=ui.Vec(200, 200))
+		self.add_subview(button)
+		self._button = button
 
 		for i in range(0, 10):
 			scroll.add_subview(ui.Label(text="Testing this shit"))
@@ -29,6 +28,9 @@ class MyView(ui.View):
 		for l in self._scroll.content.subviews[1:]:
 			l.frame = l.frame.modified(y=off, size=l.preferred_size())
 			off += l.preferred_size().y
+		size = self._button.preferred_size()
+		origin = ui.Vec(self.frame.center.x, self.frame.height - size.y - 30)
+		self._button.frame = self._button.frame.modified(center=origin, size=size)
 
 
 window = ui.Window()

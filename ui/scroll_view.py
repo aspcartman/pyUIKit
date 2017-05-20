@@ -5,8 +5,8 @@ from .view import View
 
 
 class ScrollView(View):
-	def __init__(self, frame=Rect()):
-		super().__init__(frame)
+	def __init__(self, frame=Rect(), pos=None):
+		super().__init__(frame, pos)
 		content_view = View()
 		content_view.background_color = Color.clear()
 		super().add_subview(content_view)
@@ -22,7 +22,5 @@ class ScrollView(View):
 	def layout(self):
 		self._content_view.frame = self._content_view.frame.modified(size=self.frame.size)
 
-	def handle_event(self, event):
-		if isinstance(event, MouseEvent):
-			if event.type == MouseEvent.SCROLL:
-				self._content_view.frame += Vec(event.delta.x, -event.delta.y)
+	def mouse_scroll(self, event: MouseEvent):
+		self._content_view.frame += Vec(event.delta.x, -event.delta.y)

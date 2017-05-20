@@ -47,22 +47,22 @@ class Vec:
 class Rect:
 	__slots__ = ['_origin', '_size']
 
-	def __init__(self, x: float = 0, y: float = 0, width: float = 0, height: float = 0, origin: Vec = None, size: Vec = None, center: Vec = None):
+	def __init__(self, x: float = None, y: float = None, width: float = None, height: float = None, origin: Vec = None, size: Vec = None, center: Vec = None):
 		if origin:
 			self._origin = origin
 		else:
-			self._origin = Vec(x, y)
+			self._origin = Vec(x if x else 0, y if y else 0)
 
 		if size:
 			self._size = size
 		else:
-			self._size = Vec(width, height)
+			self._size = Vec(width if width else 0, height if height else 0)
 
 		if center:
 			self._origin = center - self.size / 2
 
-	def modified(self, x: float = None, y: float = None, width: float = None, height: float = None, origin: Vec = None, size: Vec = None):
-		return Rect(origin=origin if origin else Vec(x, y) if x or y else self.origin, size=size if size else Vec(width, height) if width or height else self.size)
+	def modified(self, x: float = None, y: float = None, width: float = None, height: float = None, origin: Vec = None, size: Vec = None, center: Vec = None):
+		return Rect(origin=origin if origin else Vec(x, y) if x or y else self.origin, size=size if size else Vec(width, height) if width or height else self.size, center=center)
 
 	@property
 	def origin(self) -> Vec:

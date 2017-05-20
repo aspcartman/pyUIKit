@@ -18,6 +18,8 @@ class Window(Controller, View):
 		self._needs_update = False
 		self._root_controller = None
 		self._view = self
+		self._view_clicked: View = None
+		self._last_view_mouse_was_over: View = None
 		if root is not None:
 			self.root_controller = root
 		if real_window:
@@ -112,19 +114,35 @@ class Window(Controller, View):
 	#
 	def process_mouse_event(self, type, location, delta=None, buttons=None, modifiers=None):
 		view = self.hit_test(location)
+		event = MouseEvent(type, view, self.convert_to(view, location), delta=delta)
+		if not self._view_clicked and view is not self._last_view_mouse_was_over:
+			if self._last_view_mouse_was_over:
+				self._last_view_mouse_was_over.mouse_leave(event)
+			if view:
+				view.mouse_enter(event)
+			self._last_view_mouse_was_over = view
 		if view is None:
 			return
-		event = MouseEvent(type, view, self.convert_to(view, location), delta=delta)
-		while view is not None and not view.handle_event(event):
-			view = view.next_responder()
+
+		if type == MouseEvent.MOVE:
+			view.mouse_move(event)
+		if type == MouseEvent.TOUCH:
+			view.mouse_click(event)
+			self._view_clicked = view
+		if type == MouseEvent.RELEASE:
+			if self._view_clicked:
+				self._view_clicked.mouse_release(event)
+				self._view_clicked = None
+			else:
+				view.mouse_release(self)
+		if type == MouseEvent.DRAG:
+			if self._view_clicked:
+				view.mouse_drag(event)
+		if type == MouseEvent.SCROLL:
+			view.mouse_scroll(event)
 
 	def process_event(self, event):
 		pass
-
-	def handle_event(self, event):
-		pass
-
-	# print('Unhandled event', event)
 
 	#
 	# !- Responder

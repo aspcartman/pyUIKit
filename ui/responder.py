@@ -1,3 +1,6 @@
+from .event import MouseEvent
+
+
 class Responder:
 	def __init__(self):
 		super().__init__()
@@ -44,5 +47,30 @@ class Responder:
 		self.window.first_responder = None
 		return True
 
-	def handle_event(self, event) -> bool:
-		return False
+	def mouse_enter(self, event: MouseEvent):
+		resp = self.next_responder()
+		return resp.mouse_enter(event) if resp else False
+
+	def mouse_leave(self, event: MouseEvent):
+		resp = self.next_responder()
+		return resp.mouse_leave(event) if resp else False
+
+	def mouse_click(self, event: MouseEvent):
+		resp = self.next_responder()
+		return resp.mouse_click(event) if resp else False
+
+	def mouse_release(self, event: MouseEvent):
+		resp = self.next_responder()
+		return resp.mouse_release(event) if resp else False
+
+	def mouse_drag(self, event: MouseEvent):
+		resp = self.next_responder()
+		return resp.mouse_drag(event) if resp else False
+
+	def mouse_move(self, event: MouseEvent):
+		resp = self.next_responder()
+		return resp.mouse_move(event) if resp else False
+
+	def mouse_scroll(self, event: MouseEvent):
+		resp = self.next_responder()
+		return resp.mouse_scroll(event) if resp else False

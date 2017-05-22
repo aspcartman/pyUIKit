@@ -31,15 +31,17 @@ class Button(View):
         self._label.frame = Rect(size=self._label.preferred_size(), center=self.frame.size / 2)
 
     def mouse_enter(self, event: MouseEvent):
-        self.background_color = Color.scheme.tint()
-        if self.action:
-            self.action()
+        if event.view is self:
+            self.background_color = Color.scheme.tint()
 
     def mouse_leave(self, event: MouseEvent):
-        self.background_color = Color.scheme.warn()
+        if event.view is self:
+            self.background_color = Color.scheme.warn()
 
     def mouse_click(self, event: MouseEvent):
         self.background_color = Color.scheme.front()
 
     def mouse_release(self, event: MouseEvent):
         self.background_color = Color.scheme.tint()
+        if self.action:
+            self.action()

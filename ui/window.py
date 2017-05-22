@@ -5,6 +5,7 @@ from .color import Color
 from .controller import Controller
 from .event import MouseEvent
 from .geom import Rect, Vec
+from .responder import Responder
 from .view import View
 
 
@@ -19,7 +20,7 @@ class Window(Controller, View):
 		self._root_controller = None
 		self._view = self
 		self._view_clicked: View = None
-		self._last_view_mouse_was_over: View = None
+		self._view_under_mouse: View = None
 		if root is not None:
 			self.root_controller = root
 		if real_window:
@@ -115,12 +116,16 @@ class Window(Controller, View):
 	def process_mouse_event(self, type, location, delta=None, buttons=None, modifiers=None):
 		view = self.hit_test(location)
 		event = MouseEvent(type, view, self.convert_to(view, location), delta=delta)
-		if not self._view_clicked and view is not self._last_view_mouse_was_over:
-			if self._last_view_mouse_was_over:
-				self._last_view_mouse_was_over.mouse_leave(event)
-			if view:
-				view.mouse_enter(event)
-			self._last_view_mouse_was_over = view
+		under = list(view.superviews(include_self=True))
+
+		if self._view_under_mouse and view:
+			print('{} && {} = {}'.format(view, self._view_under_mouse, self._view_under_mouse.first_common_superview(view)))
+			self.propagate_event(event, view, Responder.mouse_enter, until=self._view_under_mouse)
+		if self._view_under_mouse and self._view_under_mouse not in under:
+			print('Under:', under)
+			self.propagate_event(event, self._view_under_mouse, Responder.mouse_leave, until=self._view_under_mouse.first_common_superview(view))
+		self._view_under_mouse = view
+		print('---')
 		if view is None:
 			return
 
@@ -140,6 +145,13 @@ class Window(Controller, View):
 				view.mouse_drag(event)
 		if type == MouseEvent.SCROLL:
 			view.mouse_scroll(event)
+
+	def propagate_event(self, event, obj, selector: callable, until=None):
+		receivers = set()
+		while obj and obj is not until:
+			print('Sent {} to {}'.format(selector.__name__, obj))
+			receivers.add(obj)
+			obj = getattr(obj, selector.__name__)(event)
 
 	def process_event(self, event):
 		pass

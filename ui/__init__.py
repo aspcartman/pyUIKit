@@ -1,3 +1,4 @@
+from .animation import Animation, lerp
 from .button import Button
 from .color import Color
 from .controller import Controller
@@ -9,4 +10,4 @@ from .scroll_view import ScrollView
 from .view import View
 from .window import Window
 
-__all__ = ["view", "window", "controller", "geom", "color", "navigation_controller", "event", "scroll_view", "label", "button"]
+__all__ = ["view", "window", "controller", "geom", "color", "navigation_controller", "event", "scroll_view", "label", "button", "animation"]

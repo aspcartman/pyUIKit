@@ -48,29 +48,22 @@ class Responder:
 		return True
 
 	def mouse_enter(self, event: MouseEvent):
-		resp = self.next_responder()
-		return resp.mouse_enter(event) if resp else False
+		return self.next_responder()
 
 	def mouse_leave(self, event: MouseEvent):
-		resp = self.next_responder()
-		return resp.mouse_leave(event) if resp else False
+		return self.next_responder()
 
 	def mouse_click(self, event: MouseEvent):
-		resp = self.next_responder()
-		return resp.mouse_click(event) if resp else False
+		return self.next_responder()
 
 	def mouse_release(self, event: MouseEvent):
-		resp = self.next_responder()
-		return resp.mouse_release(event) if resp else False
+		return self.next_responder()
 
 	def mouse_drag(self, event: MouseEvent):
-		resp = self.next_responder()
-		return resp.mouse_drag(event) if resp else False
+		return self.next_responder()
 
 	def mouse_move(self, event: MouseEvent):
-		resp = self.next_responder()
-		return resp.mouse_move(event) if resp else False
+		return self.next_responder()
 
 	def mouse_scroll(self, event: MouseEvent):
-		resp = self.next_responder()
-		return resp.mouse_scroll(event) if resp else False
+		return self.next_responder()

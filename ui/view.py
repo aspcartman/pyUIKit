@@ -19,6 +19,7 @@ class View(Responder):
 		self._superview = None
 		self._needs_layout = True
 		self._needs_draw = True
+		self.animating = False
 
 	def __str__(self):
 		return '{} {}'.format(self.__class__.__name__, self._frame)
@@ -32,7 +33,7 @@ class View(Responder):
 	def frame(self, value):
 		old = self._frame.size
 		self._frame = value
-		if old != value.size:
+		if not self.animating and old != value.size:
 			self.set_needs_layout()
 
 	#
@@ -83,6 +84,8 @@ class View(Responder):
 		self._subviews.append(subview)
 
 	def first_common_superview(self, view) -> ['View']:  # Needs optimizations
+		if not view:
+			return None
 		mine = set(self.superviews(include_self=True))
 		for sv in view.superviews(include_self=True):
 			if sv in mine:

@@ -32,14 +32,14 @@ class Button(View):
 
 	def mouse_enter(self, event: MouseEvent):
 		self.background_color = Color.scheme.tint()
+		if self.action:
+			self.action()
 
 	def mouse_leave(self, event: MouseEvent):
 		self.background_color = Color.scheme.warn()
 
 	def mouse_click(self, event: MouseEvent):
 		self.background_color = Color.scheme.front()
-		if self.action:
-			self.action(self)
 
 	def mouse_release(self, event: MouseEvent):
 		self.background_color = Color.scheme.tint()

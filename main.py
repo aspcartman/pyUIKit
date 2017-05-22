@@ -1,3 +1,5 @@
+import random
+
 from pyglet.gl import *
 
 import ui
@@ -17,11 +19,16 @@ class MyView(ui.View):
 		self._scroll = scroll
 
 		button = ui.Button(title="I'm the button, bitches!", origin=ui.Vec(200, 200))
+		button.action = self.animate
 		self.add_subview(button)
 		self._button = button
 
 		for i in range(0, 10):
 			scroll.add_subview(ui.Label(text="Testing this shit"))
+
+	def animate(self):
+		new = self._button.frame.modified(origin=ui.Vec(random.randrange(0, self.frame.size.x), random.randrange(0, self.frame.size.y)))
+		ui.Animation.animate_property(self._button, self._button.__class__.frame, new)
 
 	def layout(self):
 		off = 0

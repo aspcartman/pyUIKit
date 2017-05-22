@@ -25,10 +25,16 @@ class Vec:
 	def __sub__(self, other):
 		return Vec(self._x - other._x, self._y - other._y)
 
+	def __mul__(self, other):
+		if isinstance(other, Vec):
+			return Vec(self._x * other._x, self._y * other._y)
+		if isinstance(other, (int, float, complex)):
+			return Vec(self._x * other, self._y * other)
+
 	def __truediv__(self, other):
 		if isinstance(other, Vec):
 			return Vec(self._x / other._x, self._y / other._y)
-		if isinstance(other, (float, int)):
+		if isinstance(other, (int, float, complex)):
 			return Vec(self._x / other, self._y / other)
 
 	def __str__(self):
@@ -110,6 +116,10 @@ class Rect:
 			return Rect(origin=self.origin - other.origin, size=self.size - other.size)
 		if isinstance(other, Vec):
 			return Rect(origin=self.origin - other, size=self.size)
+
+	def __mul__(self, other):
+		if isinstance(other, (int, float)):
+			return Rect(origin=self.origin * other, size=self.size * other)
 
 	def __str__(self):
 		return "{},{}".format(self.origin, self.size)

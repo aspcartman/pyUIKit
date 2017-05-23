@@ -21,6 +21,7 @@ class Window(Controller, View):
         self._view = self
         self._view_clicked: View = None
         self._view_under_mouse: View = None
+        self._pyglet_window = None
         if root is not None:
             self.root_controller = root
         if real_window:
@@ -35,8 +36,6 @@ class Window(Controller, View):
             window.set_handler('on_mouse_leave', self._pyglet_on_mouse_leave)
             window.set_handler('on_mouse_scroll', self._pyglet_on_mouse_scroll)
             self._pyglet_window = window
-        else:
-            self._pyglet_window = None
 
     #
     # !- Pyglet Events

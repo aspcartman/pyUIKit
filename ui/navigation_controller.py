@@ -23,6 +23,18 @@ class NavigationController(Controller):
         self.add_subcontroller(value)
         self.view.content_view = value.view
 
+    def add_subcontroller(self, controller):
+        super().add_subcontroller(controller)
+        controller.navigation_controller = self
+
+    def remove_subcontroller(self, controller):
+        super().remove_subcontroller(controller)
+        controller.navigation_controller = None
+
+    def push(self, controller):
+        self.add_subcontroller(controller)
+        self.view.content_view = controller.view
+
     @property
     def view(self) -> 'NavigationView':
         return super().view
@@ -58,6 +70,10 @@ class NavigationView(View):
         self.insert_subview(0, value)
         self._content_view = value
         self.set_needs_layout()
+
+    def animate_push(self, t):
+        self._prev_view.frame
+
 
 
 class NavigationBar(View):

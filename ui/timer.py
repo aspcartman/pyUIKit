@@ -6,8 +6,11 @@ class Timer:
         self.interval = interval
         self.func = func
         self.repeat = repeat
+        self.scheduled = False
 
     def schedule(self):
+        if self.scheduled:
+            return
         if self.repeat:
             if not self.interval:
                 pyglet.clock.schedule(self.execute)
@@ -15,9 +18,11 @@ class Timer:
                 pyglet.clock.schedule_interval(self.execute, self.interval)
         else:
             pyglet.clock.schedule_once(self.execute, self.interval)
+        self.scheduled = True
 
     def execute(self, wtf):
         self.func()
 
     def unschedule(self):
         pyglet.clock.unschedule(self.execute)
+        self.scheduled = False

@@ -8,6 +8,16 @@ import ui
 class MainController(ui.Controller):
     def __init__(self):
         super().__init__(view_class=MyView, title="lol")
+        self.toggle = False
+
+    def btn(self, btn):
+        ui.View.animator.begin()
+        if self.toggle:
+            self.view.layout()
+        else:
+            btn.frame = ui.Rect(0, 0, 500, 500)
+        ui.View.animator.commit()
+        self.toggle = not self.toggle
 
 
 class MyView(ui.View):
@@ -19,17 +29,12 @@ class MyView(ui.View):
         self._scroll = scroll
 
         button = ui.Button(title="I'm the button, bitches!", origin=ui.Vec(200, 200))
-        button.action = self.animate
+        button.action = lambda x: self._controller.btn(x)
         self.add_subview(button)
         self._button = button
 
         for i in range(0, 10):
             scroll.add_subview(ui.Label(text="Testing this shit"))
-
-    def animate(self):
-        new = self._button.frame.modified(
-            origin=ui.Vec(random.randrange(0, self.frame.size.x), random.randrange(0, self.frame.size.y)))
-        ui.Animation.animate_property(self._button, self._button.__class__.frame, new)
 
     def layout(self):
         off = 0

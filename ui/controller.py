@@ -21,7 +21,7 @@ class Controller(Responder):
     def view(self):
         if self._view is None:
             view = self.load_view()
-            view.delegate = self
+            view._controller = self
             self._view = view
             return view
         else:

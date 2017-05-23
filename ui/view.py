@@ -4,13 +4,13 @@ from graphics import Context
 from .color import Color
 from .geom import Rect, Vec
 from .responder import Responder
+from .animation import Animator, lerp
 
 
 class View(Responder):
-    def __init__(self, frame=None, origin=None, size=None):
+    def __init__(self, frame=None, origin=None, size=None, controller=None):
         super().__init__()
         self.background_color = Color.scheme.front()
-        self.delegate = None
         if origin or size:
             self._frame = Rect(origin=origin, size=size)
         else:
@@ -19,22 +19,47 @@ class View(Responder):
         self._superview = None
         self._needs_layout = True
         self._needs_draw = True
-        self.animating = False
+        self._controller = None
 
     def __str__(self):
         return '{} {}'.format(self.__class__.__name__, self._frame)
 
-    # !- Frame & Bounds
-    @property
+    #
+    # !- Animations
+    #
+    animator = Animator()
+
+    class AnimatableProperty:
+        def __init__(self, func):
+            self.prop = property(func)
+
+        def generate_animated_setter(self, getter, setter):
+            def set_animated(self, new):
+                if View.animator.in_animation():
+                    old = getter(self)
+
+                    def animate(t):
+                        setter(self, lerp(t, old, new))
+
+                    View.animator.add(animate)
+                else:
+                    setter(self, new)
+
+            return set_animated
+
+        def setter(self, f):
+            return self.prop.setter(self.generate_animated_setter(self.prop.fget, f))
+
+    #
+    # !- Frame
+    #
+    @AnimatableProperty
     def frame(self):
         return self._frame
 
     @frame.setter
     def frame(self, value):
-        old = self._frame.size
         self._frame = value
-        if not self.animating and old != value.size:
-            self.set_needs_layout()
 
     #
     # !- Hierarchy
@@ -61,6 +86,7 @@ class View(Responder):
         view.remove_from_superview()
         self._subviews.append(view)
         view.superview = self
+        self.set_needs_layout()
 
     def insert_subview(self, i, view):
         view.remove_from_superview()
@@ -166,6 +192,6 @@ class View(Responder):
     # !- Responder Chain
     #
     def next_responder(self):
-        if self.delegate is not None:
-            return self.delegate
+        if self._controller is not None:
+            return self._controller
         return self.superview

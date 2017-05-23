@@ -44,4 +44,4 @@ class Button(View):
     def mouse_release(self, event: MouseEvent):
         self.background_color = Color.scheme.tint()
         if self.action:
-            self.action()
+            self.action(self)

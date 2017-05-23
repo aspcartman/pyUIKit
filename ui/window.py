@@ -116,7 +116,7 @@ class Window(Controller, View):
     #
     def process_mouse_event(self, type, location, delta=None, buttons=None, modifiers=None):
         view = self.hit_test(location)
-        event = MouseEvent(type, view, self.convert_to(view, location), delta=delta)
+        event = MouseEvent(type, view, self.convert_to(view, location), delta=delta, buttons=buttons, modifiers=modifiers)
 
         if self._view_under_mouse is not view:
             if self._view_under_mouse:

@@ -1,6 +1,34 @@
 import math
 
 
+def outbound(left_limit, x, right_limit):
+    if left_limit < right_limit:
+        if x > right_limit:
+            return x - right_limit
+        if x < left_limit:
+            return x + left_limit
+    else:
+        if x < right_limit:
+            return x - right_limit
+        if x > left_limit:
+            return x + left_limit
+    return 0
+
+
+def inbound(left_limit, x, right_limit):
+    if left_limit < right_limit:
+        if x > right_limit:
+            return right_limit
+        if x < left_limit:
+            return left_limit
+    else:
+        if x > left_limit:
+            return left_limit
+        if x < right_limit:
+            return right_limit
+    return x
+
+
 class Vec:
     __slots__ = ['_x', '_y']
 
@@ -19,11 +47,26 @@ class Vec:
     def length(self):
         return math.sqrt(self._x * self._x + self._y * self._y)
 
+    def modified(self, x: float = None, y: float = None):
+        return Vec(x if x else self._x, y if y else self._y)
+
+    def outbound(self, other):
+        return Vec(outbound(0, self.x, other.x), outbound(0, self.y, other.y))
+
+    def max(self, other):
+        return Vec(max(self._x, other._x), max(self._y, other._y))
+
+    def min(self, other):
+        return Vec(min(self._x, other._x), min(self._y, other._y))
+
     def __add__(self, other):
         return Vec(self._x + other._x, self._y + other._y)
 
     def __sub__(self, other):
         return Vec(self._x - other._x, self._y - other._y)
+
+    def __neg__(self):
+        return Vec(-self._x, -self._y)
 
     def __mul__(self, other):
         if isinstance(other, Vec):
@@ -45,6 +88,18 @@ class Vec:
 
     def __eq__(self, other):
         return self._x == other._x and self._y == other._y
+
+    def __le__(self, other):
+        return self.length() <= other.length()
+
+    def __lt__(self, other):
+        return self.length() < other.length()
+
+    def __ge__(self, other):
+        return self.length() >= other.length()
+
+    def __gt__(self, other):
+        return self.length() > other.length()
 
     def __contains__(self, other):
         return 0 <= self._x - other._x <= self._x and 0 <= self._y - other._y <= self._y
@@ -116,9 +171,25 @@ class Rect:
 
     def __sub__(self, other):
         if isinstance(other, Rect):
-            return Rect(origin=self.origin - other.origin, size=self.size - other.size)
+            r1 = self.origin + self.size
+            r2 = other.origin + other.size
+            origin = self.origin.max(other.origin)
+            size = r1.min(r2) - origin
+            return Rect(origin=origin, size=size if size._x > 0 and size._y > 0 else Vec())
         if isinstance(other, Vec):
             return Rect(origin=self.origin - other, size=self.size)
+
+    def __le__(self, other):
+        return self.size <= other.size
+
+    def __lt__(self, other):
+        return self.size < other.size
+
+    def __ge__(self, other):
+        return self.size >= other.size
+
+    def __gt__(self, other):
+        return self.size > other.size
 
     def __mul__(self, other):
         if isinstance(other, (int, float)):

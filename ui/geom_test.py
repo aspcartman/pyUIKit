@@ -29,3 +29,8 @@ class TestRect:
         assert Vec(1, 1) in Rect(0, 0, 1, 1)
         assert Vec(-1, -1) not in Rect(0, 0, 1, 1)
         assert Vec(2, 1) not in Rect(0, 0, 1, 1)
+
+    def test_intersect_sub(self):
+        assert Rect(0, 0, 10, 10) - Rect(2, 2, 6, 6) == Rect(2, 2, 6, 6)
+        assert Rect(0, 0, 10, 10) - Rect(9, 9, 10, 10) == Rect(9, 9, 1, 1)
+        assert Rect(0, 0, 10, 10) - Rect(10, 10, 10, 10) == Rect(10, 10)

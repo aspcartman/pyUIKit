@@ -20,7 +20,7 @@ def cubic_time_function(t):
 
 
 class Animation:
-    def __init__(self, duration=0.33, offset=0, time_func=cubic_time_function, completion=None):
+    def __init__(self, duration, offset=0, time_func=cubic_time_function, completion=None):
         self.duration = duration
         self.animation_functions = list()
         self.time_function = time_func
@@ -79,7 +79,7 @@ class Animator:
             if finished:
                 if anim.completion:
                     anim.completion()
+                self._active.remove(anim)
 
         if len(self._pending) == 0 and len(self._active) == 0:
             self._timer.unschedule()
-

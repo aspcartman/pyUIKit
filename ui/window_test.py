@@ -13,6 +13,5 @@ class TestWindow:
         v.mouse_click = MagicMock()
         window = Window(real_window=False, root=vc)
         window.frame = Rect(0, 0, 100, 100)
-        window.layout()
         window.process_mouse_event(MouseEvent.TOUCH, Vec(10, 10))
         v.mouse_click.assert_called()

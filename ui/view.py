@@ -29,37 +29,48 @@ class View(Responder):
     #
     animator = Animator()
 
-    class AnimatableProperty:
-        def __init__(self, func):
-            self.prop = property(func)
+    # noinspection PyPep8Naming
+    class animatable:
+        def __init__(self, prop):
+            self.prop = prop
 
         def generate_animated_setter(self, getter, setter):
             def set_animated(self, new):
                 if View.animator.in_animation():
                     old = getter(self)
+                    if old != new:
+                        def animate(t):
+                            setter(self, lerp(t, old, new))
 
-                    def animate(t):
-                        setter(self, lerp(t, old, new))
-
-                    View.animator.add(animate)
+                        View.animator.add(animate)
+                    else:
+                        setter(self, new)
                 else:
                     setter(self, new)
 
             return set_animated
 
-        def setter(self, f):
+        def setter(self, f) -> property:
             return self.prop.setter(self.generate_animated_setter(self.prop.fget, f))
 
     #
     # !- Frame
     #
-    @AnimatableProperty
+    @animatable
+    @property
     def frame(self):
         return self._frame
 
     @frame.setter
     def frame(self, value):
+        old = self._frame
         self._frame = value
+        if old.size != value.size:
+            self.set_needs_layout()
+
+    @property
+    def bounds(self):
+        return Rect(size=self._frame.size)
 
     #
     # !- Hierarchy
@@ -86,7 +97,6 @@ class View(Responder):
         view.remove_from_superview()
         self._subviews.append(view)
         view.superview = self
-        self.set_needs_layout()
 
     def insert_subview(self, i, view):
         view.remove_from_superview()

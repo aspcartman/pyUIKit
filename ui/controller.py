@@ -2,12 +2,11 @@ from .color import Color
 from .responder import Responder
 from .view import View
 
-
 class Controller(Responder):
     def __init__(self, view_class=View, title=None):
         super().__init__()
         self.supercontroller = None
-        self.navigation_controller = None
+        self.navigation_controller  = None
         self._navigation_title = None
         self.navigation_title = title
         self._view_class = view_class

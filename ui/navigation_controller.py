@@ -7,7 +7,7 @@ from .label import Label
 
 class NavigationController(Controller):
     def __init__(self, root=None):
-        super().__init__()
+        super().__init__(view_class=NavigationView)
         self._root = None
         if root is not None:
             self.root = root
@@ -21,7 +21,7 @@ class NavigationController(Controller):
         for c in self.subcontrollers:
             self.remove_subcontroller(c)
         self.add_subcontroller(value)
-        self.view.content_view = value.view
+        self.push(value, animated=False)
 
     def add_subcontroller(self, controller):
         super().add_subcontroller(controller)
@@ -31,22 +31,25 @@ class NavigationController(Controller):
         super().remove_subcontroller(controller)
         controller.navigation_controller = None
 
-    def push(self, controller):
+    def push(self, controller, animated=True):
         self.add_subcontroller(controller)
-        self.view.content_view = controller.view
+        self.view.push_to(controller.view, animated)
+
+    def pop(self, animated=True):
+        self.remove_subcontroller(self._subcontrollers[-1])
+        self.view.pop_to(self.subcontrollers[-1].view, animated)
 
     @property
     def view(self) -> 'NavigationView':
         return super().view
 
-    def load_view(self):
-        return NavigationView()
-
 
 class NavigationView(View):
     def __init__(self, frame=Rect()):
         super().__init__(frame)
-        self._content_view = None
+        self._back_view = None
+        self._front_view = None
+        self._right_view = None
 
         bar = NavigationBar()
         bar.title_label.text = "Testing"
@@ -55,31 +58,69 @@ class NavigationView(View):
 
     def layout(self):
         super().layout()
-        if self._content_view is not None:
-            self._content_view.frame = Rect(size=self.frame.size)
+        if self._back_view is not None:
+            self.move_subview_to_front(self._back_view)
+            self._back_view.frame = self.bounds.modified(x=-self.bounds.width / 6)
+        if self._front_view is not None:
+            self.move_subview_to_front(self._front_view)
+            self._front_view.frame = self.bounds
+        if self._right_view is not None:
+            self.move_subview_to_front(self._right_view)
+            self._right_view.frame = self.bounds.modified(x=self.bounds.width)
+        self.move_subview_to_front(self.bar)
         self.bar.frame = Rect(size=Vec(self.frame.width, self.bar.preferred_size().y))
 
+    def push_to(self, view, animated):
+        self.add_subview(view)
+        self._right_view = view
+        if animated:
+            self.layout()
+            View.animator.begin()
+
+        self._back_view, self._front_view, self._right_view = self._front_view, self._right_view, None
+        self.layout()
+
+        if animated:
+            View.animator.commit(self.finished)
+        else:
+            self.finished()
+
+    def pop_to(self, view, animated):
+        self.add_subview(view)
+        self._back_view = view
+        if animated:
+            self.layout()
+            View.animator.begin()
+
+        self._back_view, self._front_view, self._right_view = None, self._back_view, self._front_view
+        self.layout()
+
+        if animated:
+            View.animator.commit(self.finished)
+        else:
+            self.finished()
+
+    def finished(self):
+        if self._back_view:
+            self.remove_subview(self._back_view)
+            self._back_view = None
+        if self._right_view:
+            self.remove_subview(self._right_view)
+            self._right_view = None
+
     @property
-    def content_view(self) -> View:
-        return self._content_view
+    def title(self):
+        return self.bar.title_label.text
 
-    @content_view.setter
-    def content_view(self, value):
-        if self._content_view is not None:
-            self.remove_subview(self._content_view)
-        self.insert_subview(0, value)
-        self._content_view = value
-        self.set_needs_layout()
-
-    def animate_push(self, t):
-        self._prev_view.frame
-
+    @title.setter
+    def title(self, text):
+        self.bar.title_label.text = text
 
 
 class NavigationBar(View):
     def __init__(self, frame=Rect()):
         super().__init__(frame)
-        self.background_color = Color.scheme.warn().with_alpha(250)
+        self.background_color = Color.scheme.warn().with_alpha(200)
         self.title_label = Label()
         self.add_subview(self.title_label)
 

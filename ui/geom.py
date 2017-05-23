@@ -1,6 +1,14 @@
 import math
 
 
+def outbound(x, bound):
+    if x > bound:
+        return x - bound
+    if x < 0:
+        return x
+    return 0
+
+
 class Vec:
     __slots__ = ['_x', '_y']
 
@@ -19,11 +27,20 @@ class Vec:
     def length(self):
         return math.sqrt(self._x * self._x + self._y * self._y)
 
+    def modified(self, x: float = None, y: float = None):
+        return Vec(x if x else self._x, y if y else self._y)
+
+    def miss(self, other):
+        return Vec(outbound(self.x, other.x), outbound(self.y, other.y))
+
     def __add__(self, other):
         return Vec(self._x + other._x, self._y + other._y)
 
     def __sub__(self, other):
         return Vec(self._x - other._x, self._y - other._y)
+
+    def __neg__(self):
+        return Vec(-self._x, -self._y)
 
     def __mul__(self, other):
         if isinstance(other, Vec):

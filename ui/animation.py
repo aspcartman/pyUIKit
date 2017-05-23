@@ -57,7 +57,7 @@ class Animator:
         self._pending.append(anim)
         self._timer.schedule()
 
-    def tick(self):
+    def tick(self, dt):
         for anim in self._pending:  # Need to check if anim is ready to start
             self._pending.remove(anim)
             self._active.append(anim)

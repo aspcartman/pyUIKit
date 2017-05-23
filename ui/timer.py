@@ -1,4 +1,5 @@
 import pyglet
+import time
 
 
 class Timer:
@@ -7,6 +8,7 @@ class Timer:
         self.func = func
         self.repeat = repeat
         self.scheduled = False
+        self.previous_call = None
 
     def schedule(self):
         if self.scheduled:
@@ -21,7 +23,11 @@ class Timer:
         self.scheduled = True
 
     def execute(self, wtf):
-        self.func()
+        now = time.time()
+        if not self.previous_call:
+            self.previous_call = now
+        self.func(now - self.previous_call)
+        self.previous_call = now
 
     def unschedule(self):
         pyglet.clock.unschedule(self.execute)

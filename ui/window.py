@@ -42,14 +42,10 @@ class Window(Controller, View):
     # !- Pyglet Events
     #
     def _pyglet_on_draw(self):
-        start = time.time()
-        ctx = Context(None, Vec(y=self._frame.height))  # Reverting coordinate system
-        self._draw(ctx)
-        ctx.draw()
-        print('Draw took', time.time() - start)
+        self._draw(None, 0)
 
     def _pyglet_did_resize(self, width, height):
-        self.frame = Rect(0, 0, width, height)
+        self.frame = Rect(0, -height, width, height)
 
     def _pyglet_on_mouse_motion(self, x, y, dx, dy):
         self.process_mouse_event(MouseEvent.MOVE, Vec(x, self.frame.height - y), delta=Vec(dx, dy))
@@ -114,6 +110,15 @@ class Window(Controller, View):
     def layout(self):
         if self._root_controller is not None:
             self._root_controller.view.frame = Rect(size=self.frame.size)
+
+    #
+    # !- Draw
+    #
+    def _draw(self, ctx: Context, deep):
+        start = time.time()
+        super()._draw(ctx, deep + 1)
+        self._ctx.draw()
+        print('Draw took', time.time() - start)
 
     #
     # !- Events

@@ -32,11 +32,10 @@ class Label(View):
     @text_color.setter
     def text_color(self, value):
         self._text_color = value
-        self._pyglet_label.color = value.tuple()
 
     def draw(self, ctx: Context):
         if not self._pyglet_label or self._pyglet_label.batch != ctx.batch:
-            self._pyglet_label = pyglet.text.Label(text=self._text, color=self._text_color.tuple(), dpi=226, x=ctx.offset.x, y=ctx.offset.y - self._pyglet_label.content_height + 5, font_size=10, batch=ctx.batch, group=ctx)
+            self._pyglet_label = pyglet.text.Label(text=self._text, dpi=226, x=ctx.offset.x, font_size=10, batch=ctx.batch, group=ctx)
         pass
 
     def preferred_size(self):

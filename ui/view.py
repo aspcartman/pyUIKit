@@ -10,7 +10,7 @@ from .responder import Responder
 class View(Responder):
     def __init__(self, frame=None, origin=None, size=None, controller=None):
         super().__init__()
-        self.background_color = Color.scheme.front()
+        self._background_color = Color.scheme.front()
         if origin or size:
             self._frame = Rect(origin=origin, size=size)
         else:
@@ -20,6 +20,7 @@ class View(Responder):
         self._needs_layout = True
         self._needs_draw = True
         self._controller = None
+        self._ctx = None
 
     def __str__(self):
         return '{} {}'.format(self.__class__.__name__, self._frame)
@@ -87,6 +88,15 @@ class View(Responder):
     def superview(self, value):
         self._superview = value
 
+    @property
+    def background_color(self):
+        return self._background_color
+
+    @background_color.setter
+    def background_color(self, value):
+        self._background_color = value
+        self.set_needs_redraw()
+
     def superviews(self, include_self=False):
         current = self if include_self else self.superview
         while current is not None:
@@ -106,6 +116,8 @@ class View(Responder):
     def remove_subview(self, view):
         self._subviews.remove(view)
         view.superview = None
+        if view._ctx:
+            view._ctx.clear()
 
     def remove_from_superview(self):
         if self.superview is not None:
@@ -155,15 +167,26 @@ class View(Responder):
     #
     # !- Drawing
     #
-    def _draw(self, ctx: Context):
-        ctx.draw_rect(Rect(size=self.frame.size), self.background_color)
-        self._needs_draw = False
-        self.draw(ctx)
+    def set_needs_redraw(self):
+        self._needs_draw = True
+
+    def _draw(self, ctx: Context, deep):
+        if not self._ctx or self._ctx.parent is not ctx or self._ctx.index != deep:
+            if not self._ctx:
+                self._ctx = Context(ctx, deep)
+            self._needs_draw = True
+        print(self, self._ctx)
+        self._ctx.offset = self.frame.origin
+        if self._needs_draw:
+            self._ctx.clear()
+            self.draw(self._ctx)
+            self._needs_draw = False
         for sv in self.subviews:
-            sv_ctx = Context(ctx, sv.frame.origin)
-            sv._draw(sv_ctx)
+            deep += 1
+            sv._draw(self._ctx, deep)
 
     def draw(self, ctx: Context):
+        ctx.draw_rect(Rect(size=self.frame.size), self.background_color)
         pass
 
     #

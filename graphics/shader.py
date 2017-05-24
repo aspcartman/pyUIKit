@@ -112,14 +112,18 @@ class SimpleShader(Shader):
             void main()
             {
                 gl_Position = gl_ModelViewProjectionMatrix * (gl_Vertex + position);
+                gl_FrontColor = gl_Color;
+                gl_TexCoord[0] = gl_MultiTexCoord0;
             }
         '''
 
     def fragment_shader_source(self):
         return '''
             uniform vec4 color;
+            uniform sampler2D tex;
+            
             void main (void)
             {
-                gl_FragColor = color;
+                gl_FragColor = color + gl_Color*texture2D(tex,gl_TexCoord[0].xy);
             }
         '''

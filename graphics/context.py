@@ -1,35 +1,49 @@
 import pyglet
 from pyglet.gl import *
 
+from ui.color import Color
 from ui.geom import *
 from .shader import SimpleShader
 
 
 class Context(pyglet.graphics.OrderedGroup):
-    def __init__(self, parent, offset=Vec(0, 0)):
+    def __init__(self, parent, deep):
         if parent:
-            self.offset = Vec(parent.offset.x + offset.x, parent.offset.y - offset.y)
-            self.index = parent.index = parent.index + 1
+            self.index = deep
             self.batch = parent.batch
             self.shader = parent.shader
             self.parent = parent
         else:
-            self.index = 0
-            self.offset = offset
+            self.index = deep
             self.batch = pyglet.graphics.Batch()
             self.shader = SimpleShader()
             self.parent = None
 
+        self._offset = Vec(0, 0)
         self._color = None
+        self._vertex_lists = []
         super().__init__(self.index, parent)
+        if not self.parent:
+            self.shader.bind()
+
+    @property
+    def offset(self):
+        if self.parent:
+            return self.parent.offset + self._offset
+        return self._offset
+
+    @offset.setter
+    def offset(self, value):
+        self._offset = Vec(value.x, - value.y)
 
     def set_state(self):
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-        if not self.parent:
-            self.shader.bind()
         self.shader.position = self.offset
-        self.shader.color = self._color
+        if self._color:
+            self.shader.color = self._color
+        else:
+            self.shader.color = Color.clear()
 
     def draw_rect(self, rect, color):
         vertexes = (rect.x, rect.y,
@@ -37,7 +51,13 @@ class Context(pyglet.graphics.OrderedGroup):
                     rect.x + rect.width, rect.y - rect.height,
                     rect.x, rect.y - rect.height)
         self._color = color
-        self.batch.add(4, pyglet.gl.GL_QUADS, self, ('v2f', vertexes))
+        vl = self.batch.add(4, pyglet.gl.GL_QUADS, self, ('v2f', vertexes))
+        self._vertex_lists.append(vl)
 
     def draw(self):
         self.batch.draw()
+
+    def clear(self):
+        for vl in self._vertex_lists:
+            vl.delete()
+        self._vertex_lists = []

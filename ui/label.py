@@ -1,7 +1,7 @@
 import pyglet
 
-from graphics import Context
 from .color import Color
+from .context import Context
 from .geom import Rect, Vec
 from .view import View
 

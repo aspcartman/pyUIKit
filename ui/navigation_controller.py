@@ -1,8 +1,8 @@
-from ui.color import Color
-from ui.controller import Controller
-from ui.geom import *
-from ui.view import View
+from .color import Color
+from .controller import Controller
+from .geom import Rect, Vec
 from .label import Label
+from .view import View
 
 
 class NavigationController(Controller):

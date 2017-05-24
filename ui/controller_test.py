@@ -1,4 +1,4 @@
-from ui.controller import Controller
+from .controller import Controller
 
 
 class TestController:

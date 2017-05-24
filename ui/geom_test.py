@@ -1,4 +1,4 @@
-from ui.geom import *
+from .geom import Rect, Vec
 
 
 class TestVec:

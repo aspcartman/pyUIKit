@@ -39,6 +39,7 @@ class Button(View):
             self.background_color = Color.scheme.warn()
 
     def mouse_click(self, event: MouseEvent):
+        print("Click!")
         self.background_color = Color.scheme.front()
 
     def mouse_release(self, event: MouseEvent):

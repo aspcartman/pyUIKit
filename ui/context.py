@@ -1,21 +1,23 @@
 import pyglet
 from pyglet.gl import *
 
-from ui.color import Color
-from ui.geom import *
+from .color import Color
+from .geom import Vec
 from .group import FuckYouGroup
 from .shader import SimpleShader
 
 
 class Context:
-    def __init__(self):
+    def __init__(self, view):
         super().__init__()
+        self._view = view
         self._offset = Vec(0, 0)
-        self._vertex_lists = []
         self._shader = None
         self._batch = None
         self._color = None
         self._parent: 'Context' = None
+        self._parent_group = None
+        self._vertex_lists = []
         self._child_contexts = []
         self._group = None
         self.empty = True
@@ -24,24 +26,25 @@ class Context:
     def parent(self):
         return self._parent
 
-    @parent.setter
-    def parent(self, new: 'Context'):
-        self._parent = new
-
     @property
     def index(self):
         if self._group:
             return self._group.order
         raise Exception('No index!')
 
-    @index.setter
-    def index(self, new):
-        if self._group and self._group.order == new:
+    def set_parent_and_index(self, parent: Context, index):
+        if self._parent is parent and self._parent_group == parent._group if parent else None and self._group and self._group.order == index:
             return
-        if self._group:
-            self.clear()
-            self.batch.invalidate()
-        self._group = FuckYouGroup(self, new, self._parent._group if self._parent else None)
+
+        if self._parent:
+            self.detach()
+        if parent:
+            print('Attaching', self._view)
+            self._parent = parent
+            self._batch = parent._batch
+            self._parent_group = parent._group
+            parent._child_contexts.append(self)
+        self._group = FuckYouGroup(self, index, parent._group if parent else None)
 
     @property
     def offset(self):
@@ -53,7 +56,7 @@ class Context:
 
     @property
     def batch(self):
-        return self._batch if self._batch else self._parent.batch if self._parent else None
+        return self._batch
 
     @batch.setter
     def batch(self, value):
@@ -68,10 +71,14 @@ class Context:
         self._shader = value
 
     def set_state(self):
-        glEnable(GL_BLEND)
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-        self.shader.position = self.offset
-        self.shader.color = self._color if self._color else Color.clear()
+        try:
+            glEnable(GL_BLEND)
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+            self.shader.position = self.offset
+            self.shader.color = self._color if self._color else Color.clear()
+        except (Exception) as e:
+            print('It blow up again')
+            pass
 
     def unset_state(self):
         pass
@@ -90,21 +97,32 @@ class Context:
         label.y -= label.content_height / 2
         self._vertex_lists.append(label)
 
+    def detach(self):
+        print('Detaching', self._view)
+        self.clear()
+        self._group = None
+        self._parent = None
+        self._parent_group = None
+        if self._batch:
+            self._batch.invalidate()
+        self._batch = None
+        for c in self._child_contexts:
+            c.detach()
+        self._child_contexts = []
+
     def clear(self):
-        print('Clear', self)
-        # for vl in self._vertex_lists:
-        #     vl.delete()
-        # self._vertex_lists = []
-        # self.empty = True
+        for vl in self._vertex_lists:
+            vl.delete()
+        self._vertex_lists = []
+        self.empty = True
 
 
 class WindowContext(Context):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, view):
+        super().__init__(view)
         self._index = 0
         self._batch = pyglet.graphics.Batch()
         self._shader = SimpleShader()
-        self._shader.bind()
 
     def draw(self):
         self._shader.bind()

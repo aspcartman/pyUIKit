@@ -1,8 +1,8 @@
 from typing import List
 
-from graphics import Context
 from .animation import Animator, lerp
 from .color import Color
+from .context import Context
 from .geom import Rect, Vec
 from .responder import Responder
 
@@ -124,15 +124,18 @@ class View(Responder):
             self.superview.remove_subview(self)
 
     def did_move_to_superview(self):
+        self.context.detach()
         self.set_needs_redraw()
 
     def move_subview_to_back(self, subview):
         self._subviews.remove(subview)
         self._subviews.insert(0, subview)
+        subview.set_needs_redraw()
 
     def move_subview_to_front(self, subview):
         self._subviews.remove(subview)
         self._subviews.append(subview)
+        subview.set_needs_redraw()
 
     def first_common_superview(self, view) -> ['View']:  # Needs optimizations
         if not view:
@@ -171,7 +174,7 @@ class View(Responder):
     # !- Drawing
     #
     def set_needs_redraw(self):
-        self.context.clear()
+        self._needs_draw = True
 
     @property
     def context(self):
@@ -180,22 +183,24 @@ class View(Responder):
         return self._ctx
 
     def _new_context(self):
-        return Context()
+        return Context(self)
 
     def _draw(self, parent: Context, deep):
         ctx = self.context
-        ctx.parent = parent
-        ctx.index = deep
+        ctx.set_parent_and_index(parent, deep)
         ctx.offset = self.frame.origin
-        if ctx.empty:
+        if self._needs_draw:
             ctx.clear()
+        if ctx.empty:
             self.draw(ctx)
             ctx.empty = False
+        self._needs_draw = False
 
         for i, sv in enumerate(self.subviews):
             sv._draw(ctx, i)
 
     def draw(self, ctx: Context):
+        print('Drawing', self, ctx)
         ctx.draw_rect(Rect(size=self.frame.size), self.background_color)
         pass
 

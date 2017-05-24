@@ -28,7 +28,8 @@ class Timer:
         if not self.previous_call:
             self.previous_call = now
         self.func(now - self.previous_call)
-        self.previous_call = now
+        if self.scheduled:
+            self.previous_call = now
 
     def unschedule(self):
         pyglet.clock.unschedule(self.execute)

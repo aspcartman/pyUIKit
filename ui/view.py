@@ -68,6 +68,7 @@ class View(Responder):
         self._frame = value
         if old.size != value.size:
             self.set_needs_layout()
+            self.set_needs_redraw()
 
     @property
     def bounds(self):
@@ -87,6 +88,7 @@ class View(Responder):
     @superview.setter
     def superview(self, value):
         self._superview = value
+        self.did_move_to_superview()
 
     @property
     def background_color(self):
@@ -116,12 +118,13 @@ class View(Responder):
     def remove_subview(self, view):
         self._subviews.remove(view)
         view.superview = None
-        if view._ctx:
-            view._ctx.clear()
 
     def remove_from_superview(self):
         if self.superview is not None:
             self.superview.remove_subview(self)
+
+    def did_move_to_superview(self):
+        self.set_needs_redraw()
 
     def move_subview_to_back(self, subview):
         self._subviews.remove(subview)
@@ -168,22 +171,29 @@ class View(Responder):
     # !- Drawing
     #
     def set_needs_redraw(self):
-        self._needs_draw = True
+        self.context.clear()
 
-    def _draw(self, ctx: Context, deep):
-        if not self._ctx or self._ctx.parent is not ctx or self._ctx.index != deep:
-            if not self._ctx:
-                self._ctx = Context(ctx, deep)
-            self._needs_draw = True
-        print(self, self._ctx)
-        self._ctx.offset = self.frame.origin
-        if self._needs_draw:
-            self._ctx.clear()
-            self.draw(self._ctx)
-            self._needs_draw = False
-        for sv in self.subviews:
-            deep += 1
-            sv._draw(self._ctx, deep)
+    @property
+    def context(self):
+        if not self._ctx:
+            self._ctx = self._new_context()
+        return self._ctx
+
+    def _new_context(self):
+        return Context()
+
+    def _draw(self, parent: Context, deep):
+        ctx = self.context
+        ctx.parent = parent
+        ctx.index = deep
+        ctx.offset = self.frame.origin
+        if ctx.empty:
+            ctx.clear()
+            self.draw(ctx)
+            ctx.empty = False
+
+        for i, sv in enumerate(self.subviews):
+            sv._draw(ctx, i)
 
     def draw(self, ctx: Context):
         ctx.draw_rect(Rect(size=self.frame.size), self.background_color)

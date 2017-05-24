@@ -32,7 +32,7 @@ class ScrollView(View):
         self._content_view.add_subview(view)
 
     def mouse_scroll(self, event: MouseEvent):
-        self._content_view.frame += Vec(event.delta.x, -event.delta.y)
+        self._content_view.frame += Vec(0, -event.delta.y)
         if (self.frame - self._content_view.frame).size < self.frame.size:
             self._timer.schedule()
 

@@ -2,7 +2,7 @@ import time
 
 import pyglet
 
-from graphics import Context
+from graphics import Context, WindowContext
 from .color import Color
 from .controller import Controller
 from .event import MouseEvent
@@ -114,9 +114,14 @@ class Window(Controller, View):
     #
     # !- Draw
     #
+    def _new_context(self):
+        return WindowContext()
+
     def _draw(self, ctx: Context, deep):
         start = time.time()
-        super()._draw(ctx, deep + 1)
+        # if random.random() < 0.01:
+        #    self._ctx = None
+        super()._draw(ctx, deep)
         self._ctx.draw()
         print('Draw took', time.time() - start)
 

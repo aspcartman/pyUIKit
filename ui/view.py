@@ -1,10 +1,10 @@
 from typing import List
 
 from graphics import Context
+from .animation import Animator, lerp
 from .color import Color
 from .geom import Rect, Vec
 from .responder import Responder
-from .animation import Animator, lerp
 
 
 class View(Responder):
@@ -160,7 +160,7 @@ class View(Responder):
         self._needs_draw = False
         self.draw(ctx)
         for sv in self.subviews:
-            sv_ctx = ctx.new_subcontext(sv.frame.origin)
+            sv_ctx = Context(ctx, sv.frame.origin)
             sv._draw(sv_ctx)
 
     def draw(self, ctx: Context):

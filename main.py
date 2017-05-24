@@ -1,5 +1,3 @@
-import random
-
 from pyglet.gl import *
 
 import ui
@@ -43,6 +41,4 @@ class MyView(ui.View):
 
 window = ui.Window()
 window.root_controller = ui.NavigationController(MainController())
-glEnable(GL_BLEND)
-glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 pyglet.app.run()

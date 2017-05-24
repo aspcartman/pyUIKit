@@ -1,3 +1,5 @@
+import time
+
 import pyglet
 
 from graphics import Context
@@ -5,7 +7,6 @@ from .color import Color
 from .controller import Controller
 from .event import MouseEvent
 from .geom import Rect, Vec
-from .responder import Responder
 from .view import View
 
 
@@ -41,8 +42,11 @@ class Window(Controller, View):
     # !- Pyglet Events
     #
     def _pyglet_on_draw(self):
-        ctx = Context(Vec(y=self._frame.height))  # Reverting coordinate system
+        start = time.time()
+        ctx = Context(None, Vec(y=self._frame.height))  # Reverting coordinate system
         self._draw(ctx)
+        ctx.draw()
+        print('Draw took', time.time() - start)
 
     def _pyglet_did_resize(self, width, height):
         self.frame = Rect(0, 0, width, height)

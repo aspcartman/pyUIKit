@@ -1,4 +1,3 @@
-from .color import Color
 from .event import MouseEvent
 from .geom import Rect, Vec
 from .timer import Timer
@@ -9,7 +8,6 @@ class ScrollView(View):
     def __init__(self, frame=Rect(), pos=None):
         super().__init__(frame, pos)
         content_view = View()
-        content_view.background_color = Color.red()
         super().add_subview(content_view)
         self._content_view = content_view
         self._timer = Timer(0, self.get_over_here)

@@ -87,7 +87,7 @@ class Vec:
         return "({}, {})".format(self._x, self._y)
 
     def __eq__(self, other):
-        return self._x == other._x and self._y == other._y
+        return -0.01 < self._x - other.x < 0.01 and -0.01 < self._y - other._y < 0.01
 
     def __le__(self, other):
         return self.length() <= other.length()

@@ -120,7 +120,7 @@ class NavigationView(View):
 class NavigationBar(View):
     def __init__(self, frame=Rect()):
         super().__init__(frame)
-        self.background_color = Color.scheme.warn().with_alpha(200)
+        self.background_color = Color.scheme.warn().with_alpha(0.7)
         self.title_label = Label()
         self.add_subview(self.title_label)
 

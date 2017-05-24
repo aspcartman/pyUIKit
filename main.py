@@ -19,8 +19,9 @@ class MyView(ui.View):
     def __init__(self, frame=ui.Rect()):
         super().__init__(frame)
 
-        scroll = ui.ScrollView(ui.Rect(0, 0, 300, 300))
-        scroll.content_size = ui.Vec(400, 400)
+        scroll = ui.ScrollView(ui.Rect(100, 100, 300, 300))
+        scroll.content_size = ui.Vec(300, 10000)
+        scroll._content_view.background_color = ui.Color.scheme.back().with_alpha(0.5)
         self.add_subview(scroll)
         self._scroll = scroll
 

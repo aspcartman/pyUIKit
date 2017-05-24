@@ -54,6 +54,11 @@ class Context(pyglet.graphics.OrderedGroup):
         vl = self.batch.add(4, pyglet.gl.GL_QUADS, self, ('v2f', vertexes))
         self._vertex_lists.append(vl)
 
+    def draw_text(self, text, size):
+        label = pyglet.text.Label(text=text, dpi=226, font_size=size, batch=self.batch, group=self)
+        label.y -= label.content_height / 2
+        self._vertex_lists.append(label)
+
     def draw(self):
         self.batch.draw()
 

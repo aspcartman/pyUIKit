@@ -2,14 +2,14 @@ class Color:
     scheme = None
 
     def __init__(self, value=None, hex=None, r=None, g=None, b=None, a=None, tuple=None):
-        self.alpha = 255
+        self.alpha = 1.0
 
         if hex is not None:
             value = int(hex, 16)
         if value is not None:
-            self.red = (value >> 16) & 0xFF
-            self.green = (value >> 8) & 0xFF
-            self.blue = value & 0xFF
+            self.red = ((value >> 16) & 0xFF) / 0xFF
+            self.green = ((value >> 8) & 0xFF) / 0xFF
+            self.blue = (value & 0xFF) / 0xFF
         else:
             self.red = r if r is not None else 0
             self.green = g if g is not None else 0
